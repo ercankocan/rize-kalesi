@@ -4,8 +4,8 @@
 <style>
 [hidden]{display:none!important}
 .welcome{position:relative;isolation:isolate;overflow:hidden;margin:24px 0;border-radius:12px;background:#19392f;color:#fffaf0;padding:clamp(28px,6vw,80px);min-height:min(650px,78vh);display:grid;align-content:end}
-.welcome::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(11,31,24,.62),rgba(11,31,24,.25) 55%,transparent 86%),url("vadi.webp") center/cover}
-.welcome h1{max-width:100%;color:inherit;font:normal clamp(35px,4.8vw,65px)/1.08 Georgia,serif;letter-spacing:-.025em;margin:0;text-wrap:balance}
+.welcome::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(6,22,17,.83),rgba(6,22,17,.48) 55%,transparent 86%),transparent}
+.welcome video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% center;z-index:-2;pointer-events:none}.welcome{background:#19392f url("kapak.webp") center/cover}.welcome h1{max-width:100%;color:inherit;font:normal clamp(35px,4.8vw,65px)/1.08 Georgia,serif;letter-spacing:-.025em;margin:0;text-wrap:balance}
 .welcome h1 small{display:block;max-width:34em;margin:16px 0 0;font:normal clamp(19px,2vw,27px)/1.35 Georgia,serif;letter-spacing:normal;text-wrap:balance}
 .welcome p{max-width:48ch;color:#fffaf0;margin:26px 0 18px}
 .welcome-actions{display:flex;flex-wrap:wrap;gap:12px}
@@ -16,6 +16,7 @@
 @media(max-width:600px){.welcome{min-height:65vh;padding:32px 22px}.welcome-actions>*{width:100%}.welcome::before{background-position:58% center}}
 </style></head><body><header><b>RİZE KALESİ</b></header><main>
 <section class="welcome" id="welcome">
+<video id="coverfilm" muted loop playsinline aria-hidden="true" poster="kapak.webp"></video>
 <h1>Kaybolan İzleri Görünür Kılmak:<small>Rize Kalesi’nin Dijital Rekonstrüksiyonu ve Kültürel Miras Eğitiminde Kullanımı</small></h1>
 <p>İlk kez katılıyorsan ön testi tamamla. Ardından bu sayfaya dön ve aynı katılım koduyla platforma gir.</p>
 <div class="welcome-actions"><a href="https://forms.gle/DacPp6SzEcdJG2SS7" target="_blank" rel="noopener">Ön teste katıl</a><button id="enter" type="button" aria-controls="pilotlogin" aria-expanded="false">Platforma giriş</button></div>
@@ -58,6 +59,16 @@ Object.assign(stops,{"ic": ["İçkale", "İçkale planda yaklaşık 150 metre y�
 
 el('planagain').onclick=()=>{el('big').src=docs[0][3];el('big').alt=docs[0][2];el('zoom').showModal()};
 const config=window.RIZE_PILOT;
+const film=el('coverfilm');
+const motion=matchMedia('(prefers-reduced-motion: reduce)');
+function playCover(){
+ if(motion.matches || document.hidden || el('welcome').hidden){film.pause();return;}
+ if(!film.hasAttribute('src')) film.src='kapak.mp4';
+ film.play().catch(()=>{});
+}
+motion.addEventListener('change', playCover);
+document.addEventListener('visibilitychange', playCover);
+playCover();
 let code='';
 const stages=[0,1,2].map(i=>({answer:el('q'+i),finish:el('finish'+i),note:el('note'+i),message:el('pilotmsg'+i)}));
 const draftKey=i=>'rize-pilot:'+code+':'+i;
@@ -119,7 +130,7 @@ login.onsubmit=async e=>{
   const previous=await rpc('rize_pilot_oturum',{p_kod:candidate});
   if(!previous||typeof previous!=='object'||Array.isArray(previous))throw Error();
   code=candidate;
-  el('welcome').hidden=true;
+  el('welcome').hidden=true;film.pause();
   login.hidden=true;
   el('learning').hidden=false;
   document.querySelector('[data-page]').focus();
