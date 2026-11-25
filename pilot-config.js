@@ -1,0 +1,1 @@
+window.RIZE_PILOT = {"url": "https://wgobtkspzezvlhepscim.supabase.co", "key": "sb_publishable_oCSetSNQ3yNH-cEOG1JXrQ_KEJoLNKm"};
